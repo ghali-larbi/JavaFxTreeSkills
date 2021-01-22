@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package brieftreeskills;
+package brieftreeskills.Controller;
 
+import brieftreeskills.Models.connection;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -13,13 +14,18 @@ import java.sql.Statement;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 import javax.swing.JOptionPane;
 
 /**
@@ -82,7 +88,7 @@ public class FXMLDocumentController implements Initializable {
        sql="insert into user values('"+cin.getText()+"','"+nom.getText()+"','"+prenom.getText()+"','"+userN.getText()+"','"+pass.getText()+"','"+staff.getText()+"')";
        }
         statement=cnx.createStatement();
-        statement.executeQuery(sql);
+        statement.executeUpdate(sql);
         JOptionPane.showMessageDialog(null, "incription done!!", "InfoBox: ",JOptionPane.INFORMATION_MESSAGE);
         paneInscription.setVisible(false);
         
@@ -93,7 +99,7 @@ public class FXMLDocumentController implements Initializable {
     }
     }
     @FXML
-    private void login(ActionEvent event) {
+    private void login(ActionEvent event) throws Exception {
           try
     { 
         connection con=new connection();
@@ -101,13 +107,26 @@ public class FXMLDocumentController implements Initializable {
     String  sql="select * from user where userName='"+logUserName.getText()+"' and password='"+logPassword.getText()+"'";
      statement=cnx.createStatement();
         ResultSet res= statement.executeQuery(sql);
-        if(res.next()){
-       JOptionPane.showMessageDialog(null, "authentification done!!", "InfoBox: ",JOptionPane.INFORMATION_MESSAGE);
+          if(res.next()){
+            if(res.getString("role").equals("apprenant")){
+              Parent PageStaff=FXMLLoader.load(getClass().getResource("/View/pageapprenant.fxml"));
+              Scene s=new Scene(PageStaff);
+              Stage page=(Stage)((Node)event.getSource()).getScene().getWindow();
+              page.setScene(s);
+              page.show();
+            }
+             if(res.getString("role").equals("staff")){
+                 Parent PageStaff=FXMLLoader.load(getClass().getResource("/View/pageStaff.fxml"));
+              Scene s=new Scene(PageStaff);
+              Stage page=(Stage)((Node)event.getSource()).getScene().getWindow();
+              page.setScene(s);
+              page.show();
+            }
         }
-        else{
+           else{
        JOptionPane.showMessageDialog(null, "invalide!!", "error: ",JOptionPane.INFORMATION_MESSAGE);
-
-        }
+        } 
+       
     }
     catch (SQLException e)
     {
